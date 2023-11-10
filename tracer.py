@@ -39,12 +39,12 @@ class Tracer:
 
     def out(self, count: int, startTime: float, rsp: Packet):
         if rsp is None:
-            res = f'{str(count): <5}{"*": <16}{"-": <6}'
+            res = f'{str(count): <5}{"*": <16}{"-": <8}'
             if self.verbose:
                 res += f'{"-"}'
             print(res)
             return
-        res = f'{count: <5}{rsp.src: <16}{str(int(rsp.time - startTime)): <6}'
+        res = f'{count: <5}{rsp.src: <16}{str(int((rsp.time - startTime) * 1000)) + " ms": <8}'
         if self.verbose:
             asys = whois.whois(rsp.src).getValue('origin') or '-'
             res += f'{asys}'
@@ -60,11 +60,12 @@ class Tracer:
             if rsp is None:
                 rsp = self.sr(scanPacket)
 
-            self.out(count + 1, scanPacket.time, rsp)
+            self.out(count, scanPacket.time, rsp)
 
             if rsp is None:
                 continue
 
-            if (self.protocol == 'icmp' and rsp.type == 0 or
-                    (self.protocol == 'tcp' or self.protocol == 'udp') and rsp.type == 3):
+            if self.protocol == 'icmp' and rsp.type == 0:
+                break
+            if self.protocol == 'tcp' and rsp.haslayer(TCP) or self.protocol == 'udp' and rsp.haslayer(UDP):
                 break

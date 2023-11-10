@@ -24,5 +24,5 @@ def read():
 args = read()
 print('NUM  IP            TIME  ' + ('AS' if args.verbose else ''))
 tracer = Tracer(args.dst, args.timeout, args.protocol, args.port, args.max_requests_number, args.verbose)
-# tracer = Tracer('1.1.1.1', 5, 'icmp', 53, verbose=True, maxCount=1)
+# tracer = Tracer('1.1.1.1', 1, 'tcp', 53, verbose=True, maxCount=20)
 tracer.trace()

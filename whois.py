@@ -1,5 +1,7 @@
 import socket
 
+WHOIS_SERVER_ADDRESSES = ['whois.ripe.net']
+
 
 class WhoisResponse:
     def __init__(self, data: bytes):
@@ -27,7 +29,7 @@ class WhoisResponse:
         return res
 
 
-def whois(ip: str, whoisServerAddress: str = 'icmp')\
+def whois(ip: str, whoisServerAddress: str = WHOIS_SERVER_ADDRESSES[0])\
         -> WhoisResponse:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect((whoisServerAddress, 43))
