@@ -57,6 +57,7 @@ def whois(ip: str) -> WhoisResponse:
 
             response = WhoisResponse(total_data, server)
             if response.found:
+                sock.close()
                 return response
 
     return None
