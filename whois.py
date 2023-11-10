@@ -1,12 +1,19 @@
 import socket
+from typing import Callable
 
-WHOIS_SERVER_ADDRESSES = ['whois.ripe.net']
+
+class WhoisServer:
+    def __init__(self, addr: str, mkQuery: Callable[[str], str], originName: str):
+        self.address = addr
+        self.makeQuery = mkQuery
+        self.originName = originName
 
 
 class WhoisResponse:
-    def __init__(self, data: bytes):
+    def __init__(self, data: bytes, server: WhoisServer):
         self.rawData = data
         self.data = WhoisResponse.respToDict(data)
+        self.originName = server.originName
 
     def getValue(self, key: str) -> str:
         if key in self.data:
@@ -15,7 +22,7 @@ class WhoisResponse:
 
     @property
     def found(self):
-        return self.getValue('origin') is not None
+        return self.getValue(self.originName) is not None
 
     @staticmethod
     def respToDict(data: bytes) -> dict:
@@ -29,16 +36,27 @@ class WhoisResponse:
         return res
 
 
-def whois(ip: str, whoisServerAddress: str = WHOIS_SERVER_ADDRESSES[0])\
-        -> WhoisResponse:
+WHOIS_SERVERS = [
+    WhoisServer('whois.ripe.net', lambda ip: f'{ip}\r\n', 'origin'),
+    WhoisServer('whois.iana.org', lambda ip: f'{ip}\r\n', 'origin'),
+    WhoisServer('whois.arin.net', lambda ip: f'n + {ip}\r\n', 'OriginAS'),
+]
+
+
+def whois(ip: str) -> WhoisResponse:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.connect((whoisServerAddress, 43))
-        sock.sendall(f'{ip}\r\n'.encode())
+        for server in WHOIS_SERVERS:
+            sock.connect((server.address, 43))
+            sock.sendall(server.makeQuery(ip).encode())
 
-        total_data = b''
-        data = sock.recv(4096)
-        while data:
-            total_data += data
+            total_data = b''
             data = sock.recv(4096)
+            while data:
+                total_data += data
+                data = sock.recv(4096)
 
-        return WhoisResponse(total_data)
+            response = WhoisResponse(total_data, server)
+            if response.found:
+                return response
+
+    return None

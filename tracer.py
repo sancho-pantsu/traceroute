@@ -46,7 +46,8 @@ class Tracer:
             return
         res = f'{count: <5}{rsp.src: <16}{str(int((rsp.time - startTime) * 1000)) + " ms": <8}'
         if self.verbose:
-            asys = whois.whois(rsp.src).getValue('origin') or '-'
+            whoisResp = whois.whois(rsp.src)
+            asys = whoisResp.getValue(whoisResp.originName) if whoisResp is not None else '-'
             res += f'{asys}'
         print(res)
 
