@@ -48,6 +48,7 @@ class Tracer:
         if self.verbose:
             asys = whois.whois(rsp.src).getValue('origin') or '-'
             res += f'{asys}\t'
+        print(res)
 
     def trace(self):
         count = 0
