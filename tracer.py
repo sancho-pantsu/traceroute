@@ -39,15 +39,15 @@ class Tracer:
 
     def out(self, count: int, startTime: float, rsp: Packet):
         if rsp is None:
-            res = f'{count}{"*": >5}{"-": >15}'
+            res = f'{str(count): <5}{"*": <16}{"-": <6}'
             if self.verbose:
-                res += f'{"-": >10}'
+                res += f'{"-"}'
             print(res)
             return
-        res = f'{count}{rsp.src: <5}{str(int(rsp.time - startTime)): <15}'
+        res = f'{count: <5}{rsp.src: <16}{str(int(rsp.time - startTime)): <6}'
         if self.verbose:
             asys = whois.whois(rsp.src).getValue('origin') or '-'
-            res += f'{asys: <10}'
+            res += f'{asys}'
         print(res)
 
     def trace(self):
@@ -57,6 +57,8 @@ class Tracer:
 
             scanPacket = self.makeScanPacket(count)
             rsp = self.sr(scanPacket)
+            if rsp is None:
+                rsp = self.sr(scanPacket)
 
             self.out(count + 1, scanPacket.time, rsp)
 
