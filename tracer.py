@@ -57,7 +57,7 @@ class Tracer:
             scanPacket = self.makeScanPacket(count)
             rsp = self.sr(scanPacket)
 
-            self.out(count, scanPacket.time, rsp)
+            self.out(count + 1, scanPacket.time, rsp)
 
             if rsp is None:
                 continue
