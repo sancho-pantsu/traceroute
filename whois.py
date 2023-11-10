@@ -44,20 +44,21 @@ WHOIS_SERVERS = [
 
 
 def whois(ip: str) -> WhoisResponse:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        for server in WHOIS_SERVERS:
-            sock.connect((server.address, 43))
-            sock.sendall(server.makeQuery(ip).encode())
+    for server in WHOIS_SERVERS:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((server.address, 43))
+        sock.sendall(server.makeQuery(ip).encode())
 
-            total_data = b''
+        total_data = b''
+        data = sock.recv(4096)
+        while data:
+            total_data += data
             data = sock.recv(4096)
-            while data:
-                total_data += data
-                data = sock.recv(4096)
 
-            response = WhoisResponse(total_data, server)
-            if response.found:
-                sock.close()
-                return response
+        sock.close()
+
+        response = WhoisResponse(total_data, server)
+        if response.found:
+            return response
 
     return None
