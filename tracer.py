@@ -39,9 +39,9 @@ class Tracer:
 
     def out(self, count: int, startTime: float, rsp: Packet):
         if rsp is None:
-            res = f'{count}{'*': >5}{'-': >15}'
+            res = f'{count}{"*": >5}{"-": >15}'
             if self.verbose:
-                res += f'{'-': >10}'
+                res += f'{"-": >10}'
             print(res)
             return
         res = f'{count}{rsp.src: >5}{str(int(rsp.time - startTime)): >15}'
