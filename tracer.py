@@ -44,10 +44,10 @@ class Tracer:
                 res += f'{"-": >10}'
             print(res)
             return
-        res = f'{count}{rsp.src: >5}{str(int(rsp.time - startTime)): >15}'
+        res = f'{count}{rsp.src: <5}{str(int(rsp.time - startTime)): <15}'
         if self.verbose:
             asys = whois.whois(rsp.src).getValue('origin') or '-'
-            res += f'{asys: >10}'
+            res += f'{asys: <10}'
         print(res)
 
     def trace(self):
